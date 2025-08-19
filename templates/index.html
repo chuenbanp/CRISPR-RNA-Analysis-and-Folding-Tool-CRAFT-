@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>gRNA Design & Structure Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, select {
+            margin-top: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        textarea {
+            min-height: 150px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>gRNA Design & Structure Prediction</h1>
+        <form action="/process" method="post">
+            <label for="dna_sequence">DNA Sequence (e.g., a gene coding sequence):</label>
+            <textarea id="dna_sequence" name="dna_sequence" required></textarea>
+
+            <label for="organism">Select Target Organism:</label>
+            <select id="organism" name="organism">
+                <option value="human">Human (hg38)</option>
+                <option value="mouse">Mouse (mm10)</option>
+                </select>
+
+            <label for="base_name">gRNA Base Name (Optional):</label>
+            <input type="text" id="base_name" name="base_name" value="gRNA">
+
+            <button type="submit">Run Analysis</button>
+        </form>
+    </div>
+</body>
+</html>
