@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>gRNA Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>gRNA Secondary Structure Predictions</h1>
+
+    {% if error %}
+        <div class="container">
+            <h2>❌ Analysis Error</h2>
+            <p style="color:red; font-weight:bold;">{{ error }}</p>
+            <a href="/">Go back and try again</a>
+        </div>
+    {% elif gRNA_data %}
+        <table>
+            <thead>
+                <tr>
+                <th class="neutralhead">ID</th>
+                <th class="neutralhead">Original gRNA Sequence (20nt)</th>
+                <th class="neutralhead">Adjusted gRNA Sequence</th>
+                <th class="neutralhead">PAM</th>
+                <th class="neutralhead">Flanking nt</th>
+                <th class="neutralhead">Strand</th>
+                <th class="neutralhead">%GC (6nt pre-PAM)</th>
+                <th class="neutralhead">Predicted Structure Image (Original)</th>
+                <th class="neutralhead">MFE (Original Seq) (kcal/mol)</th>
+                <th class="neutralhead">Predicted Structure Image (Adjusted)</th>
+                <th class="neutralhead">MFE (Adjusted Seq) (kcal/mol)</th>
+                <th class="neutralhead">MIT Specificity Score</th>
+                <th class="badhead">CTT at -3 to -1 (CTT NGG)</th>
+                <th class="badhead">TTT in guide (NNTTTNN)</th>
+                <th class="goodhead">C downstream of PAM (NGG C)</th>
+                <th class="goodhead">G at -1 of PAM (G NGG)</th>
+                <th class="goodhead">G at -2 of PAM (GN NGG)</th>
+                <th class="goodhead">C at -3 of PAM (CNN NGG)</th>
+                <th class="goodhead">G at -4 of PAM (GNNN NGG)</th>
+                <th class="badhead">G downstream of PAM (NGG G)</th>
+                <th class="badhead">T at N position of of PAM (NGG)</th>
+                <th class="badhead">C or T at at -1 of PAM (C/T NGG)</th>
+                <th class="goodhead">G or GG at 5'-end of guide</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grna in gRNA_data %}
+                <tr>
+                    <td>{{ grna.id }}</td>
+                    <td><code>{{ grna.original_seq }}</code></td>
+                    <td><code>{{ grna.display_seq | safe }}</code></td>
+                    <td>{{ grna.pam_seq }}</td>
+                    <td>{{ grna.flanking_nt }}</td>
+                    <td>{{ grna.strand }}</td>
+                    <td class="{{ 'gc-high' if grna.gc_content >= 50 else '' }}">{{ "%.2f"|format(grna.gc_content) }}%</td>
+                    <td><img src="{{ url_for('serve_result_file', session_id=session_id, filename=grna.id ~ '_original_ss.png') }}" alt="Structure (Original)"></td>
+                    <td>{{ grna.get('mfe_original', 'N/A') }}</td>
+                    <td><img src="{{ url_for('serve_result_file', session_id=session_id, filename=grna.id ~ '_ss.png') }}" alt="Structure (Adjusted)"></td>
+                    <td>{{ grna.get('mfe_adjusted', 'N/A') }}</td>
+                    <td>{{ grna.score }}</td>
+                    <td class="{{ 'bad' if grna.ends_in_ctt == 'Yes' else 'good' }}">{{ grna.ends_in_ctt }}</td>
+                    <td class="{{ 'bad' if grna.has_ttt == 'Yes' else 'good' }}">{{ grna.has_ttt }}</td>
+                    <td class="{{ 'good' if grna.get('flanking_nt_is_c', 'No') == 'Yes' else 'bad' }}">{{ grna.get('flanking_nt_is_c', 'No') }}</td>
+                    <td class="{{ 'good' if grna.g_at_pos_20 == 'Yes' else 'bad' }}">{{ grna.g_at_pos_20 }}</td>
+                    <td class="{{ 'good' if grna.g_at_pos_19 == 'Yes' else 'bad' }}">{{ grna.g_at_pos_19 }}</td>
+                    <td class="{{ 'good' if grna.c_at_pos_18 == 'Yes' else 'bad' }}">{{ grna.c_at_pos_18 }}</td>
+                    <td class="{{ 'good' if grna.g_at_pos_17 == 'Yes' else 'bad' }}">{{ grna.g_at_pos_17 }}</td>
+                    <td class="{{ 'bad' if grna.flanking_is_g == 'Yes' else 'good' }}">{{ grna.flanking_is_g }}</td>
+                    <td class="{{ 'bad' if grna.t_at_pam_neg_3 == 'Yes' else 'good' }}">{{ grna.t_at_pam_neg_3 }}</td>
+                    <td class="{{ 'bad' if grna.c_or_t_at_pos_20 == 'Yes' else 'good' }}">{{ grna.c_or_t_at_pos_20 }}</td>
+                    <td class="{{ 'good' if grna.g_at_pos_1_or_gg == 'Yes' else 'bad' }}">{{ grna.g_at_pos_1_or_gg }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align:center; margin: 2em;">
+             <a href="/">Run a New Analysis</a>
+        </div>
+    {% else %}
+        <div class="container">
+            <h2>No Results</h2>
+            <p>The analysis completed, but no valid gRNA data was found to display.</p>
+            <a href="/">Go back and try again</a>
+        </div>
+    {% endif %}
+</body>
+</html>
