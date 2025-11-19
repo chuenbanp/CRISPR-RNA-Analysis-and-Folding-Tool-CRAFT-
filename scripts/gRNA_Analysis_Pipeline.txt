@@ -35,7 +35,7 @@ def get_ghostscript_command():
     else:
         return "gs"
 
-def generate_colored_plots(rnafold_output, plots_dir, id_suffix=""):
+def generate_colored_plots(rnafold_output, output_dir, id_suffix=""):
     """
     Parses RNAfold output and uses RNAplot to generate colored structure plots.
     This version includes robust parsing to handle cases where RNAfold might
@@ -52,8 +52,8 @@ def generate_colored_plots(rnafold_output, plots_dir, id_suffix=""):
             continue
         grna_id_with_suffix = header[1:].strip()
         if ' ' not in seq_struct_line or '(' not in seq_struct_line:
-            #print(f"⚠️ Warning: Skipping plot for '{grna_id_with_suffix}' because its RNAfold output line is malformed or missing a structure.")
-            #print(f"   L> Offending line: \"{seq_struct_line}\"")
+            print(f"⚠️ Warning: Skipping plot for '{grna_id_with_suffix}' because its RNAfold output line is malformed or missing a structure.")
+            print(f"   L> Offending line: \"{seq_struct_line}\"")
             continue
         try:
             sequence_and_structure, mfe = seq_struct_line.strip().rsplit(' ', 1)
@@ -86,9 +86,6 @@ def generate_colored_plots(rnafold_output, plots_dir, id_suffix=""):
 def generate_excel_report(gRNA_data, output_dir):
     """Generates a formatted Excel report with embedded images."""
     print("✍️ Generating Excel report...")
-    plots_dir = os.getcwd()
-    print("plots directory for report:", plots_dir)
-
     report_path = os.path.join(output_dir, "gRNA_structures_report.xlsx")
 
     # Create a DataFrame from the results
@@ -162,10 +159,10 @@ def generate_excel_report(gRNA_data, output_dir):
         # Image insertion options
         image_options = {
             'object_position': 1,
-            'x_offset': 0,
-            'y_offset': 0,
-            'width': 600,
-            'height': 150
+            'x_offset': 5,
+            'y_offset': 5,
+            'width': 1000,
+            'height': 248
         }
 
         for idx, grna in enumerate(gRNA_data):
@@ -173,12 +170,12 @@ def generate_excel_report(gRNA_data, output_dir):
             worksheet.set_row(row_num, 125) # Set row height in points
 
             # Insert original image
-            img_path_orig = os.path.join(plots_dir, f"{grna['id']}_original_ss.png")
+            img_path_orig = os.path.join(output_dir, f"{grna['id']}_original_ss.png")
             if os.path.exists(img_path_orig):
                 worksheet.insert_image(row_num, 7, img_path_orig, image_options)
 
             # Insert adjusted image
-            img_path_adj = os.path.join(plots_dir, f"{grna['id']}_ss.png")
+            img_path_adj = os.path.join(output_dir, f"{grna['id']}_ss.png")
             if os.path.exists(img_path_adj):
                 worksheet.insert_image(row_num, 9, img_path_adj, image_options)
     
@@ -190,19 +187,10 @@ def generate_excel_report(gRNA_data, output_dir):
 def main():
     print("--- gRNA Secondary Structure Generator (with strand detection) ---")
     
-    # Change to input directory and gather all Excel file paths
-    os.chdir("../input")
-    excel_file_paths = [file for file in os.listdir() if file.lower().endswith(('.xls', '.xlsx'))]
-    if not excel_file_paths:
-        print("\n❌ Error: No valid Excel files were found. Please try again.")
+    excel_file_path = input("Please drag and drop your Excel file here and press Enter: ").strip().replace("'", "")
+    if not os.path.exists(excel_file_path):
+        print("\n❌ Error: The file was not found. Please try again.")
         return
-    
-    print("Found the following Excel files:")
-    for file in excel_file_paths:
-        print(f" - {file}")
-
-    excel_file_path = excel_file_paths[0] #Tmp: process only the first file found. Update later for multi file looping.
-    print(f"\nProcessing file: {excel_file_path}")
 
     try:
         df = pd.read_excel(excel_file_path, header=None)
@@ -301,24 +289,11 @@ def main():
     if not gRNA_data:
         print("\n❌ No valid gRNA sequences could be extracted.")
         return
-    
-    # Move to output directory
-    os.chdir("../output")
-    #Make subdirectory for this excel file
-    os.makedirs(os.path.basename(excel_file_path), exist_ok=True)
-    os.chdir(os.path.basename(excel_file_path))
-    output_dir = os.getcwd()
-    print(f"Output directory: {output_dir}")
-
-    #Make plots directory
-    os.makedirs("plots", exist_ok=True)
-    os.chdir("plots/")
-    print(f"\n✅ Found {len(gRNA_data)} valid gRNAs. Saving results in 'output' directory.")
-
-    plots_dir = os.getcwd()
-    print("plots directory:", plots_dir)
-    print("Working directory:", os.getcwd())
-
+    # Name output folder after input file (without extension)
+    input_base = os.path.splitext(os.path.basename(excel_file_path))[0]
+    output_dir = os.path.join(os.path.dirname(excel_file_path), f"gRNA_structures_{input_base}")
+    os.makedirs(output_dir, exist_ok=True)
+    print(f"\n✅ Found {len(gRNA_data)} valid gRNAs. Saving results in: {output_dir}")
     fasta_content_adjusted = ""
     for grna in gRNA_data:
         rna_seq_adjusted = grna['seq'].replace('T', 'U')
@@ -326,7 +301,7 @@ def main():
         fasta_content_adjusted += f">{grna['id']}\n{full_rna_seq_adjusted}\n"
     try:
         command = ["RNAfold", "-p", "-T", "37"]
-        completed_process_adjusted = subprocess.run(command, input=fasta_content_adjusted.encode('utf-8'), check=True, cwd=os.getcwd(), capture_output=True)
+        completed_process_adjusted = subprocess.run(command, input=fasta_content_adjusted.encode('utf-8'), check=True, cwd=output_dir, capture_output=True)
         rnafold_output_adjusted = completed_process_adjusted.stdout.decode('utf-8')
         print("✅ RNAfold analysis complete for adjusted sequences.")
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -348,7 +323,7 @@ def main():
         fasta_content_original += f">{grna['id']}_original\n{full_rna_seq_original}\n"
     try:
         command = ["RNAfold", "-p", "-T", "37"]
-        completed_process_original = subprocess.run(command, input=fasta_content_original.encode('utf-8'), check=True, cwd=os.getcwd(), capture_output=True)
+        completed_process_original = subprocess.run(command, input=fasta_content_original.encode('utf-8'), check=True, cwd=output_dir, capture_output=True)
         rnafold_output_original = completed_process_original.stdout.decode('utf-8')
         print("✅ RNAfold analysis complete for original sequences.")
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -362,17 +337,16 @@ def main():
         print("⚠️ Warning: Could not parse MFE values for all original sequences.")
         for grna in gRNA_data:
             grna['mfe_original'] = "N/A"
-
-    generate_colored_plots(rnafold_output_adjusted, plots_dir, id_suffix="_ss")
-    generate_colored_plots(rnafold_output_original, plots_dir, id_suffix="_original")
+    generate_colored_plots(rnafold_output_adjusted, output_dir)
+    generate_colored_plots(rnafold_output_original, output_dir, id_suffix="_original")
     print("⏳ Converting structure files to PNG images...")
     gs_command = get_ghostscript_command()
     if not gs_command:
         print("\n❌ Error: Could not find Ghostscript. Please install it to convert images.")
         return
     for grna in gRNA_data:
-        ps_file_adjusted = os.path.join(plots_dir, f"{grna['id']}_ss.ps")
-        png_file_adjusted = os.path.join(plots_dir, f"{grna['id']}_ss.png")
+        ps_file_adjusted = os.path.join(output_dir, f"{grna['id']}_ss.ps")
+        png_file_adjusted = os.path.join(output_dir, f"{grna['id']}_ss.png")
         if os.path.exists(ps_file_adjusted):
             try:
                 cmd_adjusted = [gs_command, "-sDEVICE=pngalpha", "-r150", "-o", png_file_adjusted, "-dEPSCrop", ps_file_adjusted]
@@ -384,14 +358,14 @@ def main():
                         resample_mode = Image.Resampling.LANCZOS
                     except AttributeError:
                         resample_mode = Image.ANTIALIAS  # for older Pillow versions
-                    img = img.resize((215, 165), resample_mode)
+                    img = img.resize((781, 515), resample_mode)
                     img.save(png_file_adjusted)
             except (subprocess.CalledProcessError, FileNotFoundError) as e:
                 print(f"⚠️ Warning: Could not convert {os.path.basename(ps_file_adjusted)}. Make sure Ghostscript is installed.")
         else:
             print(f"⚠️ Warning: PostScript file not found for adjusted sequence {grna['id']}. Skipping image conversion.")
-        ps_file_original = os.path.join(plots_dir, f"{grna['id']}_original_ss.ps")
-        png_file_original = os.path.join(plots_dir, f"{grna['id']}_original_ss.png")
+        ps_file_original = os.path.join(output_dir, f"{grna['id']}_original_ss.ps")
+        png_file_original = os.path.join(output_dir, f"{grna['id']}_original_ss.png")
         if os.path.exists(ps_file_original):
             try:
                 cmd_original = [gs_command, "-sDEVICE=pngalpha", "-r150", "-o", png_file_original, "-dEPSCrop", ps_file_original]
@@ -403,7 +377,7 @@ def main():
                         resample_mode = Image.Resampling.LANCZOS
                     except AttributeError:
                         resample_mode = Image.ANTIALIAS  # for older Pillow versions
-                    img = img.resize((215, 165), resample_mode)
+                    img = img.resize((781, 515), resample_mode)
                     img.save(png_file_original)
             except (subprocess.CalledProcessError, FileNotFoundError) as e:
                 print(f"⚠️ Warning: Could not convert {os.path.basename(ps_file_original)}. Make sure Ghostscript is installed.")
