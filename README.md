@@ -24,26 +24,26 @@ A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting seconda
 ---
 
 ### Pipeline Overview
-1. **Input:** Excel file containing gRNA sequences and MIT specificity scores.
-2. **Processing:**  
-   - Extracts gRNA sequences and PAM sites  
-   - Adjusts sequences for U3/U6 polIII-type RNA polymerase transcription efficiency (adds leading G if needed)  
-   - Predicts secondary structures using RNAfold  
-   - Converts RNAplot PostScript outputs to PNG images  
-3. **Output:**  
-   - Folder with structure images  
+1. **Input:** Excel files containing gRNA sequences and MIT specificity scores.
+2. **Processing:**
+   - Extracts gRNA sequences and PAM sites
+   - Adds alternative sequences for U3/U6 polIII-type RNA polymerase transcription efficiency (forces leading G if needed)
+   - Predicts secondary structures using RNAfold
+   - Converts RNAplot PostScript outputs to PNG images
+3. **Output:**
+   - Folder with structure images
    - Excel report summarizing:
-     - Original and adjusted sequences  
-     - Strand orientation and flanking nucleotides  
-     - GC content, MFE values  
-     - Design flags (e.g., TTT motifs, PAM context)  
-     - Embedded structure images  
+     - Original and adjusted sequences
+     - Strand orientation and flanking nucleotides
+     - GC content, MFE values
+     - Design flags (e.g., TTT motifs, PAM context)
+     - Embedded structure images
 
 
 ---
 
 ### Installation & Setup
-## Cloning the Repository
+#### Cloning the Repository
    Download the pipeline code by cloning this GitHub repository:
    ```bash/terminal
    # Navigate to the directory where you want the repo
@@ -56,16 +56,18 @@ A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting seconda
    cd gRNA-Design-and-Structure-Prediction/
    ```
 
-## Install Dependencies
-   # Option 1: Using conda (recommended to avoid dependency conflicts). For an introduction to conda, please see https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
-   *From within ./gRNA-Design-and-Structure-Prediction
+#### Install Dependencies
+   #### Option 1: Using conda (recommended to avoid dependency conflicts). 
+   From within ./gRNA-Design-and-Structure-Prediction
    ```bash/terminal
    conda env create -f CRAFT_env.yml
    conda activate CRAFT_env
    ```
-   *This will install Python 3.9, required libraries, and external tools if available via conda.
+   This will install Python 3.9, required libraries, and external tools all available via conda.
 
-   # Option 2: Manually install ViennaRNA and Ghostscript, pip for rest (collected in requirements.txt)
+   For an introduction to conda, please see https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
+
+   #### Option 2: Manually install ViennaRNA and Ghostscript, pip for rest (collected in requirements.txt)
    - **ViennaRNA** (RNAfold, RNAplot): https://www.tbi.univie.ac.at/RNA/
    - **Ghostscript**: https://www.ghostscript.com/
    #From within the parent CRAFT Folder 
@@ -81,14 +83,14 @@ A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting seconda
 
    2. *Move CRISPOR/gRNA excel files into ./input directory
 
-   2. **Run the script:**  
-      #Navigate to ./scripts directory
+   3. **Run the script:**  
+      Navigate to ./scripts directory
       ```bash/terminal
       cd scripts/
       python CRAFT.py
       ```
 
-   3. **Check ./output directory:**  
+   4. **Check ./output directory:**  
       - Images and report will be saved in a folders named for each input excel file
       - Final Excel report: `gRNA_structures_report.xlsx` generated in each folder per input file
 
