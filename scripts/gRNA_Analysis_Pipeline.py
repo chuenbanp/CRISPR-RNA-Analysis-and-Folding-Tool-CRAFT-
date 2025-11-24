@@ -5,6 +5,8 @@ import subprocess
 import webbrowser
 import pandas as pd
 from PIL import Image
+import glob
+from concurrent.futures import ProcessPoolExecutor
 
 # --- Configuration ---
 SCAFFOLD_SEQUENCE = "GUUUUAGAGCUAGAAAUAGCAAGUUAAAAUAAGGCUAGUCCGUUAUCAACUUGAAAAAGUGGCACCGAGUCGGUGC"
@@ -183,29 +185,15 @@ def generate_excel_report(gRNA_data, output_dir):
                 worksheet.insert_image(row_num, 9, img_path_adj, image_options)
     
     return report_path
-# <<< END NEW SECTION >>>
+
 
 
 # --- Main Script ---
-def main():
-    print("--- gRNA Secondary Structure Generator (with strand detection) ---")
-    
-    # Change to input directory and gather all Excel file paths
-    os.chdir("../input")
-    excel_file_paths = [file for file in os.listdir() if file.lower().endswith(('.xls', '.xlsx'))]
-    if not excel_file_paths:
-        print("\n❌ Error: No valid Excel files were found. Please try again.")
-        return
-    
-    print("Found the following Excel files:")
-    for file in excel_file_paths:
-        print(f" - {file}")
-
-    excel_file_path = excel_file_paths[0] #Tmp: process only the first file found. Update later for multi file looping.
-    print(f"\nProcessing file: {excel_file_path}")
+def main(excel_path):
+    print(f"\nProcessing file: {excel_path}")
 
     try:
-        df = pd.read_excel(excel_file_path, header=None)
+        df = pd.read_excel(excel_path, header=None)
     except Exception as e:
         print(f"\n❌ Error reading Excel file: {e}")
         return
@@ -305,8 +293,8 @@ def main():
     # Move to output directory
     os.chdir("../output")
     #Make subdirectory for this excel file
-    os.makedirs(os.path.basename(excel_file_path), exist_ok=True)
-    os.chdir(os.path.basename(excel_file_path))
+    os.makedirs(os.path.basename(excel_path), exist_ok=True)
+    os.chdir(os.path.basename(excel_path))
     output_dir = os.getcwd()
     print(f"Output directory: {output_dir}")
 
@@ -412,9 +400,33 @@ def main():
 
     report_path = generate_excel_report(gRNA_data, output_dir)
     print(f"\n🎉 All done! Your Excel report is ready: {report_path}")
+    os.chdir(input_dir)
     # The webbrowser line is removed as it cannot open Excel files reliably.
 
+# --- End of Function Definintions ---
 
+#Start of Script Execution
+print("--- Running CRISPR RNA Analysis and Folding Tool ---")
+    
+# Change to input directory and gather all Excel file paths
 if __name__ == "__main__":
-    main()
+    os.chdir("../input")
+    input_dir = os.getcwd()
+    excel_file_paths = [file for file in os.listdir() if file.lower().endswith(('.xls', '.xlsx'))]
+    if not excel_file_paths:
+        print("\n❌ Error: No valid Excel files were found. Please try again.")
+        exit(1)
 
+    print("Found the following Excel files:")
+    for file in excel_file_paths:
+        print(f" - {file}")
+
+# --- Main Execution with Parallelization ---
+    try:
+        # Parallel execution using ProcessPoolExecutor
+        with ProcessPoolExecutor() as executor:
+           executor.map(main, excel_file_paths)
+    except Exception as e:
+        print(f"⚠️ Parallelization failed ({e}). Running sequentially...")
+        for file_path in excel_file_paths:
+            main(file_path)
