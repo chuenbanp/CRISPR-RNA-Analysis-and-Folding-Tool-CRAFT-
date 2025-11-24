@@ -1,6 +1,7 @@
 import os
 import re
 import platform
+import shutil
 import subprocess
 import webbrowser
 import pandas as pd
@@ -410,6 +411,7 @@ print("--- Running CRISPR RNA Analysis and Folding Tool ---")
     
 # Change to input directory and gather all Excel file paths
 if __name__ == "__main__":
+    # Change to input directory
     os.chdir("../input")
     input_dir = os.getcwd()
     excel_file_paths = [file for file in os.listdir() if file.lower().endswith(('.xls', '.xlsx'))]
@@ -421,7 +423,7 @@ if __name__ == "__main__":
     for file in excel_file_paths:
         print(f" - {file}")
 
-# --- Main Execution with Parallelization ---
+    # --- Main Execution with Parallelization ---
     try:
         # Parallel execution using ProcessPoolExecutor
         with ProcessPoolExecutor() as executor:
