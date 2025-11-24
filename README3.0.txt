@@ -1,4 +1,4 @@
-# CRISPR gRNA Secondary Structure Analysis Pipeline
+# CRISPR RNA Analysis and Folding Tool (CRAFT)
 
 A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting secondary structures, and generating a comprehensive Excel report with fold-structure images and design metrics.
 
@@ -39,70 +39,71 @@ A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting seconda
      - Design flags (e.g., TTT motifs, PAM context)  
      - Embedded structure images  
 
+
+---
+
+### Installation & Setup
+## Cloning the Repository
+   Download the pipeline code by cloning this GitHub repository:
+   ```bash/terminal
+   # Navigate to the directory where you want the repo
+   cd /path/to/your/projects
+
+   # Clone the repository
+   git clone https://github.com/chuenbanp/gRNA-Design-and-Structure-Prediction.git
+
+   # Enter the cloned folder
+   cd gRNA-Design-and-Structure-Prediction/
+   ```
+
+## Install Dependencies
+   # Option 1: Using conda (recommended to avoid dependency conflicts). For an introduction to conda, please see https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
+   *From within ./gRNA-Design-and-Structure-Prediction
+   ```bash/terminal
+   conda env create -f CRAFT_env.yml
+   conda activate CRAFT_env
+   ```
+   *This will install Python 3.9, required libraries, and external tools if available via conda.
+
+   # Option 2: Manually install ViennaRNA and Ghostscript, pip for rest (collected in requirements.txt)
+   - **ViennaRNA** (RNAfold, RNAplot): https://www.tbi.univie.ac.at/RNA/
+   - **Ghostscript**: https://www.ghostscript.com/
+   #From within the parent CRAFT Folder 
+   ```bash/terminal
+   pip install -r requirements.txt
+   ```
+   *requirements.txt includes pandas, Pillow, XlsxWriter, openpyxl, and xlrd
+
 ---
 
 ### Running the Pipeline
-1. **Install dependencies:**  
-   ```bash
-   pip install pandas Pillow xlsxwriter
-   ```
-   Ensure ViennaRNA and Ghostscript are installed and available in your PATH.
+   1. **Install Dependencies, see above**
 
-2. **Run the script:**  
-   ```bash
-   python gRNA_Analysis_Pipeline.py
-   ```
+   2. *Move CRISPOR/gRNA excel files into ./input directory
 
-3. **Check output:**  
-   - Images and report will be saved in a folder named `gRNA_structures_<input_filename>`  
-   - Final Excel report: `gRNA_structures_report.xlsx`
+   2. **Run the script:**  
+      #Navigate to ./scripts directory
+      ```bash/terminal
+      cd scripts/
+      python CRAFT.py
+      ```
+
+   3. **Check ./output directory:**  
+      - Images and report will be saved in a folders named for each input excel file
+      - Final Excel report: `gRNA_structures_report.xlsx` generated in each folder per input file
 
 ---
 
 ### Notes
 - Input Excel must have `targetSeq` and `mitSpecScore` columns.
-- RNAfold may take time depending on the number of gRNAs.
+- RNAfold/.png conversion may take time depending on the number of gRNAs.
 - Ghostscript is required for converting RNAplot `.ps` files to `.png`.
-
-
----
-
-### Installation & Setup
-
-#### Option 1: Using conda (recommended to avoid dependency conflicts). For an introduction to conda, please see https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
-#From within the parent CRAFT Folder 
-```bash
-conda env create -f CRAFT_env.yml
-conda activate CRAFT_env
-```
-
-This will install Python 3.9, required libraries, and external tools if available via conda.
-
-
-#### Option 2: Manually install ViennaRNA and Ghostscript, pip for rest of the required packages 
-- **ViennaRNA** (RNAfold, RNAplot): https://www.tbi.univie.ac.at/RNA/
-- **Ghostscript**: https://www.ghostscript.com/
-
-#From within the parent CRAFT Folder 
-```bash
-pip install -r requirements.txt
-```
-# requirements.txt includes pandas, Pillow, XlsxWriter, openpyxl, and xlrd
 
 ---
 
 ### Portability & Troubleshooting
 - The pipeline uses `subprocess` calls for ViennaRNA and Ghostscript. These must be installed and accessible.
 - Python dependencies are listed in `requirements.txt` and `environment.yml`.
-- If Ghostscript is missing, image conversion will fail. Consider adding a fallback or skipping image embedding.
-- For Windows users, Ghostscript executable is typically `gswin64c.exe`. For Mac/Linux, it's `gs`.
+- Conda installation of required packages should be portable across Mac, Windows, and Linux.
 
 ---
-
-### Runtime Dependency Checks
-The script will verify:
-- `RNAfold` availability
-- `RNAplot` availability
-- `Ghostscript` availability
-
-If any are missing, it should print instructions and exit.
