@@ -44,7 +44,8 @@ A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting seconda
 
 ### Installation & Setup
 #### Cloning the Repository
-   Download the pipeline code by cloning this GitHub repository:
+   Download the pipeline code by cloning this GitHub repository.
+   In Terminal:
    ```bash/terminal
    # Navigate to the directory where you want the repo
    cd /path/to/your/projects
