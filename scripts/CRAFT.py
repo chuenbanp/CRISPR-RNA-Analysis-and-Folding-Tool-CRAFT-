@@ -366,7 +366,7 @@ def main(excel_path):
             try:
                 cmd_adjusted = [gs_command, "-sDEVICE=pngalpha", "-r150", "-o", png_file_adjusted, "-dEPSCrop", ps_file_adjusted]
                 subprocess.run(cmd_adjusted, check=True, capture_output=True)
-                # Resize the PNG to 781x515 after conversion
+                # Resize the PNG to 215x165 after conversion
                 if os.path.exists(png_file_adjusted):
                     img = Image.open(png_file_adjusted)
                     try:
@@ -385,7 +385,7 @@ def main(excel_path):
             try:
                 cmd_original = [gs_command, "-sDEVICE=pngalpha", "-r150", "-o", png_file_original, "-dEPSCrop", ps_file_original]
                 subprocess.run(cmd_original, check=True, capture_output=True)
-                # Resize the PNG to 781x515 after conversion
+                # Resize the PNG to 215x165 after conversion
                 if os.path.exists(png_file_original):
                     img = Image.open(png_file_original)
                     try:
@@ -410,7 +410,7 @@ def main(excel_path):
 print("--- Running CRISPR RNA Analysis and Folding Tool ---")
     
 # Change to input directory and gather all Excel file paths
-if __name__ == "__main__":
+if __name__ == "__main__": 
     # Change to input directory
     os.chdir("../input")
     input_dir = os.getcwd()

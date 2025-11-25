@@ -70,11 +70,11 @@ A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting seconda
    #### Option 2: Manually install ViennaRNA and Ghostscript, pip for rest (collected in requirements.txt)
    - **ViennaRNA** (RNAfold, RNAplot): https://www.tbi.univie.ac.at/RNA/
    - **Ghostscript**: https://www.ghostscript.com/
-   #From within the parent CRAFT Folder 
+   From within the parent CRAFT Folder:
    ```bash/terminal
    pip install -r requirements.txt
    ```
-   *requirements.txt includes pandas, Pillow, XlsxWriter, openpyxl, and xlrd
+   requirements.txt includes pandas, Pillow, XlsxWriter, openpyxl, and xlrd
 
 ---
 
