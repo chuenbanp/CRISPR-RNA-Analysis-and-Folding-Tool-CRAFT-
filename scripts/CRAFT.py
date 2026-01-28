@@ -111,7 +111,7 @@ def generate_excel_report(gRNA_data, output_dir):
         'flanking_is_c': 'C downstream of PAM (NGG C)', 'g_at_pos_20': 'G at -1 of PAM (G NGG)',
         'g_at_pos_19': 'G at -2 of PAM (GN NGG)', 'c_at_pos_18': 'C at -3 of PAM (CNN NGG)',
         'g_at_pos_17': 'G at -4 of PAM (GNNN NGG)', 'flanking_is_g': 'G downstream of PAM (NGG G)',
-        't_at_pam_neg_3': 'T at N position of of PAM (NGG)', 'c_or_t_at_pos_20': 'C or T at at -1 of PAM (C/T NGG)',
+        't_at_pam_neg_3': 'T at N position of of PAM (NGG)', 'c_or_t_at_pos_20': 'C or T at -1 of PAM (C/T NGG)',
         'g_at_pos_1_or_gg': 'G or GG at 5-end of guide'
     }
     df = df.rename(columns=column_map)
