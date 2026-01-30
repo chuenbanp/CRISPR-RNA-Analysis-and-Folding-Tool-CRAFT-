@@ -88,7 +88,15 @@ A Python-based pipeline for analyzing CRISPR gRNA candidates, predicting seconda
       Navigate to ./scripts directory
       ```bash/terminal
       cd scripts/
+      ```
+
+      3a. If using conda, run:
+      ```bash/terminal
       "$CONDA_PREFIX/bin/python" -u CRAFT.py
+      ```
+      3b. If set-up using pip, run:
+      ```bash/terminal
+      python -u CRAFT.py
       ```
 
    4. **Check ./output directory:**  
