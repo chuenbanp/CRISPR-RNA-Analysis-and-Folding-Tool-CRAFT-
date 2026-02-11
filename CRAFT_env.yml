@@ -1,6 +1,7 @@
 name: CRAFT_env
 channels:
   - conda-forge
+  - bioconda
 dependencies:
   - python=3.9
   - pandas
