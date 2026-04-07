@@ -103,7 +103,7 @@ def generate_excel_report(gRNA_data, output_dir):
     
     # Rename columns for clarity in the report
     column_map = {
-        'id': 'ID', 'original_seq': 'Original gRNA Sequence (20nt)', 'display_seq': 'Adjusted gRNA Sequence (with G at 5-end if needed',
+        'id': 'ID', 'original_seq': 'Original gRNA Sequence (20nt)', 'display_seq': 'Adjusted gRNA Sequence',
         'pam_seq': 'PAM', 'flanking_nuc': 'Flanking nt', 'strand': 'Strand',
         'gc_content': '%GC (6nt pre-PAM)', 'mfe_original': 'MFE (Original Seq) (kcal/mol)',
         'mfe_adjusted': 'MFE (Adjusted Seq) (kcal/mol)', 'score': 'MIT Specificity Score',
@@ -111,8 +111,8 @@ def generate_excel_report(gRNA_data, output_dir):
         'flanking_is_c': 'C downstream of PAM (NGG C)', 'g_at_pos_20': 'G at -1 of PAM (G NGG)',
         'g_at_pos_19': 'G at -2 of PAM (GN NGG)', 'c_at_pos_18': 'C at -3 of PAM (CNN NGG)',
         'g_at_pos_17': 'G at -4 of PAM (GNNN NGG)', 'flanking_is_g': 'G downstream of PAM (NGG G)',
-        't_at_pam_neg_3': 'T at N position of of PAM (NGG)', 'c_or_t_at_pos_20': 'C or T at -1 of PAM (C/T NGG)',
-        'g_at_pos_1_or_gg': 'G or GG at 5-end of guide (Original Seq)'
+        't_at_pam_neg_3': 'T at N position of PAM (NGG)', 'c_or_t_at_pos_20': 'C or T at -1 of PAM (C/T NGG)',
+        'g_at_pos_1_or_gg': 'G or GG at 5-end of guide'
     }
     df = df.rename(columns=column_map)
 
@@ -158,23 +158,30 @@ def generate_excel_report(gRNA_data, output_dir):
 
 
         # --- Insert Images and Set Row/Column Sizes ---
-        worksheet.set_column('B:C', 25)  # Sequence columns
+        worksheet.set_column('A:A', 10)  # Set column width for ID
+        worksheet.set_column('B:C', 25)  # Set column width for sequences
+        worksheet.set_column('E:G', 10)  # Set column width for PAM, flanking nt, strand
         worksheet.set_column('H:H', 30)  # Original Image column
+        worksheet.set_column('I:I', 15)  # Set column width for MFE Original
         worksheet.set_column('J:J', 30)  # Adjusted Image column
-
+        worksheet.set_column('K:W', 15)  # Set column width for the rest
+        
         # Image insertion options
         image_options = {
+           'x_scale': 0.8,
+            'y_scale': 0.8,
+            'x_offset': 30,
+            'y_offset': 15,
             'object_position': 1,
-            'x_offset': 0,
-            'y_offset': 0,
-            'width': 600,
-            'height': 150
         }
+
+         # Freeze panes to keep headers visible
+        worksheet.freeze_panes(1, 0)  
 
         for idx, grna in enumerate(gRNA_data):
             row_num = idx + 1 # +1 to account for header row
             worksheet.set_row(row_num, 125) # Set row height in points
-            seq_name = f" gRNA {idx + 1:03}"  # Add a space for better visual separation
+            seq_name = f" gRNA_{idx + 1:03}"  # Add an underscore for better visual separation
             worksheet.write(row_num, 0, seq_name) # Write sequence name in the first column for clarity
 
             # Insert original image
@@ -261,7 +268,7 @@ def main(excel_path):
                     else:
                         adjusted_guide_seq = 'G' + original_guide_seq[1:]
                         display_guide_seq = f"G{original_guide_seq[1:]}"
-                g_at_pos_1_or_gg = "Yes" if original_guide_seq.startswith('G') else "No"
+                g_at_pos_1_or_gg = "Yes" if adjusted_guide_seq.startswith('G') else "No"
                 g_at_pos_20 = "Yes" if original_guide_seq[19] == 'G' else "No"
                 g_at_pos_19 = "Yes" if original_guide_seq[18] == 'G' else "No"
                 c_at_pos_18 = "Yes" if original_guide_seq[17] == 'C' else "No"
