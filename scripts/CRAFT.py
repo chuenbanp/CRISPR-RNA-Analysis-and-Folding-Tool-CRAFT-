@@ -172,8 +172,10 @@ def generate_excel_report(gRNA_data, output_dir):
         }
 
         for idx, grna in enumerate(gRNA_data):
-            row_num = idx + 1 # 0-indexed loop for 1-indexed Excel rows (after header)
+            row_num = idx + 1 # +1 to account for header row
             worksheet.set_row(row_num, 125) # Set row height in points
+            seq_name = f" gRNA {idx + 1:03}"  # Add a space for better visual separation
+            worksheet.write(row_num, 0, seq_name) # Write sequence name in the first column for clarity
 
             # Insert original image
             img_path_orig = os.path.join(plots_dir, f"{grna['id']}_original_ss.png")
