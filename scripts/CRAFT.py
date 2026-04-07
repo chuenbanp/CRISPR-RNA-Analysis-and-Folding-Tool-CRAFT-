@@ -103,7 +103,7 @@ def generate_excel_report(gRNA_data, output_dir):
     
     # Rename columns for clarity in the report
     column_map = {
-        'id': 'ID', 'original_seq': 'Original gRNA Sequence (20nt)', 'display_seq': 'Adjusted gRNA Sequence',
+        'id': 'ID', 'original_seq': 'Original gRNA Sequence (20nt)', 'display_seq': 'Adjusted gRNA Sequence (with G at 5-end if needed',
         'pam_seq': 'PAM', 'flanking_nuc': 'Flanking nt', 'strand': 'Strand',
         'gc_content': '%GC (6nt pre-PAM)', 'mfe_original': 'MFE (Original Seq) (kcal/mol)',
         'mfe_adjusted': 'MFE (Adjusted Seq) (kcal/mol)', 'score': 'MIT Specificity Score',
@@ -112,7 +112,7 @@ def generate_excel_report(gRNA_data, output_dir):
         'g_at_pos_19': 'G at -2 of PAM (GN NGG)', 'c_at_pos_18': 'C at -3 of PAM (CNN NGG)',
         'g_at_pos_17': 'G at -4 of PAM (GNNN NGG)', 'flanking_is_g': 'G downstream of PAM (NGG G)',
         't_at_pam_neg_3': 'T at N position of of PAM (NGG)', 'c_or_t_at_pos_20': 'C or T at -1 of PAM (C/T NGG)',
-        'g_at_pos_1_or_gg': 'G or GG at 5-end of guide'
+        'g_at_pos_1_or_gg': 'G or GG at 5-end of guide (Original Seq)'
     }
     df = df.rename(columns=column_map)
 
@@ -261,7 +261,7 @@ def main(excel_path):
                     else:
                         adjusted_guide_seq = 'G' + original_guide_seq[1:]
                         display_guide_seq = f"G{original_guide_seq[1:]}"
-                g_at_pos_1_or_gg = "Yes" if adjusted_guide_seq.startswith('G') else "No"
+                g_at_pos_1_or_gg = "Yes" if original_guide_seq.startswith('G') else "No"
                 g_at_pos_20 = "Yes" if original_guide_seq[19] == 'G' else "No"
                 g_at_pos_19 = "Yes" if original_guide_seq[18] == 'G' else "No"
                 c_at_pos_18 = "Yes" if original_guide_seq[17] == 'C' else "No"
