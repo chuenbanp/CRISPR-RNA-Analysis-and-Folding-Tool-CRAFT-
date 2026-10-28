@@ -1,12 +1,9 @@
 import os
 import re
 import platform
-import shutil
 import subprocess
-import webbrowser
 import pandas as pd
 from PIL import Image
-import glob
 from concurrent.futures import ProcessPoolExecutor
 
 # --- Configuration ---
@@ -323,7 +320,7 @@ def main(excel_path):
         full_rna_seq_adjusted = rna_seq_adjusted + SCAFFOLD_SEQUENCE
         fasta_content_adjusted += f">{grna['id']}\n{full_rna_seq_adjusted}\n"
     try:
-        command = ["RNAfold", "-p", "-T", "37"]
+        command = ["RNAfold", "-T", "37"]
         completed_process_adjusted = subprocess.run(command, input=fasta_content_adjusted.encode('utf-8'), check=True, cwd=os.getcwd(), capture_output=True)
         rnafold_output_adjusted = completed_process_adjusted.stdout.decode('utf-8')
         print("✅ RNAfold analysis complete for adjusted sequences.")
@@ -345,7 +342,7 @@ def main(excel_path):
         full_rna_seq_original = rna_seq_original + SCAFFOLD_SEQUENCE
         fasta_content_original += f">{grna['id']}_original\n{full_rna_seq_original}\n"
     try:
-        command = ["RNAfold", "-p", "-T", "37"]
+        command = ["RNAfold", "-T", "37"]
         completed_process_original = subprocess.run(command, input=fasta_content_original.encode('utf-8'), check=True, cwd=os.getcwd(), capture_output=True)
         rnafold_output_original = completed_process_original.stdout.decode('utf-8')
         print("✅ RNAfold analysis complete for original sequences.")
@@ -411,7 +408,6 @@ def main(excel_path):
     report_path = generate_excel_report(gRNA_data, output_dir)
     print(f"\n🎉 All done! Your Excel report is ready: {report_path}")
     os.chdir(input_dir)
-    # The webbrowser line is removed as it cannot open Excel files reliably.
 
 # --- End of Function Definintions ---
 
